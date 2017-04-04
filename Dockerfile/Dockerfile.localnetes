@@ -1,17 +1,44 @@
-FROM coreos/apache:latest
+FROM ubuntu:14.04
 
 RUN apt-get update && apt-get install -y \
-    curl
+    curl 
+    
+# RUN sudo apt-get install -y \
+    # linux-image-extra-$(uname -r) \
+    # linux-image-extra-virtual
 
+RUN sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    software-properties-common 
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+RUN sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable" && \
+   apt-get update && \
+   apt-get install -y \
+   docker-ce
+
+ENV OS=linux
+ENV ARCH=amd64
 ENV ETCD_VER=v3.1.5
 ENV GOOGLE_URL=https://storage.googleapis.com/etcd
 ENV GITHUB_URL=https://github.com/coreos/etcd/releases/download
 ENV DOWNLOAD_URL=${GOOGLE_URL}
 
-RUN rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+RUN rm -f /tmp/etcd-${ETCD_VER}-${OS}-${ARCH}.tar.gz
 RUN rm -rf /tmp/test-etcd && mkdir -p /tmp/test-etcd
 
-RUN curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
-RUN tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/test-etcd --strip-components=1
+RUN curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-${OS}-${ARCH}.tar.gz -o /tmp/etcd-${ETCD_VER}-${OS}-${ARCH}.tar.gz
+RUN tar xzvf /tmp/etcd-${ETCD_VER}-${OS}-${ARCH}.tar.gz -C /tmp/test-etcd --strip-components=1
 
 RUN mv /tmp/test-etcd/etcd /bin/etcd
+
+ENV GO_VER=1.7.5
+
+RUN curl -L https://storage.googleapis.com/golang/go${GO_VER}.${OS}-${ARCH}.tar.gz -o /tmp/go${GO_VER}.${OS}-${ARCH}.tar.gz && \
+    tar xzf /tmp/go${GO_VER}.${OS}-${ARCH}.tar.gz -C /usr/local && \
+    mv /usr/local/go/bin/go /bin/go
