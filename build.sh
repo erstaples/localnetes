@@ -2,11 +2,7 @@
 set -euo pipefail
 
 ECR_DOMAIN=erstaples
-
-
 IMAGE_NAME="localnetes"
-
-## if unset, use tag
 VERSION=0.0.1
 
 function build {
