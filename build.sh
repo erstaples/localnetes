@@ -16,12 +16,12 @@ function push {
   docker push  ${FULL_IMAGE_NAME}
 }
 
-build $image_name
+build $IMAGE_NAME
 
 PUSH=${1:-}
 if [ "$PUSH" == "push" ]
 then
-  push $image_name
+  push $IMAGE_NAME
 fi
 
 
