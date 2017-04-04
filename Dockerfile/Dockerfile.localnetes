@@ -1,0 +1,15 @@
+FROM coreos/apache:latest
+
+RUN apt-get update && apt-get install -y \
+    curl
+
+ENV ETCD_VER=v3.1.5
+ENV GOOGLE_URL=https://storage.googleapis.com/etcd
+ENV GITHUB_URL=https://github.com/coreos/etcd/releases/download
+ENV DOWNLOAD_URL=${GOOGLE_URL}
+
+RUN rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+RUN rm -rf /tmp/test-etcd && mkdir -p /tmp/test-etcd
+
+RUN curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+RUN tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/test-etcd --strip-components=1
