@@ -52,9 +52,12 @@ ENV GOARCH=${ARCH}
 
 RUN apt-get install -y gcc
 
+#root of kubernetes repo. must be able to run `./hack/local-up-cluster.sh` from WORKDIR
 WORKDIR /root/go/src/github.com/erstaples/kubernetes
 
 
-#dockerd works only when container is in "privileged" mode
+#container must run in "privileged" mode
 #docker run --privileged -dv $GOPATH:/root/go erstaples/localnetes:0.0.1
+#todo: add ./hack/local-up-cluster.sh to cmd. plan out how to run container in build mode vs run mode, or whether build mode should
+#even be an option in the container
 CMD ["dockerd"]
