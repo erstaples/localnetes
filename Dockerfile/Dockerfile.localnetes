@@ -1,5 +1,8 @@
 FROM ubuntu:14.04
 
+LABEL maintainer "erstaples@gmail.com"
+LABEL description "Installs dependencies to run a locally built Kubernetes cluster using ./hack/local-up-cluster.sh: etcd, docker, go, and more."
+
 RUN apt-get update && apt-get install -y \
     curl 
     
@@ -10,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 RUN sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
-    software-properties-common 
+    software-properties-common
 
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -40,5 +43,18 @@ RUN mv /tmp/test-etcd/etcd /bin/etcd
 ENV GO_VER=1.7.5
 
 RUN curl -L https://storage.googleapis.com/golang/go${GO_VER}.${OS}-${ARCH}.tar.gz -o /tmp/go${GO_VER}.${OS}-${ARCH}.tar.gz && \
-    tar xzf /tmp/go${GO_VER}.${OS}-${ARCH}.tar.gz -C /usr/local && \
-    mv /usr/local/go/bin/go /bin/go
+    tar xzf /tmp/go${GO_VER}.${OS}-${ARCH}.tar.gz -C /usr/local
+
+ENV GOPATH="/root/go"
+ENV PATH="${PATH}:${GOPATH}/bin:/usr/local/go/bin"
+ENV GOOS=${OS}
+ENV GOARCH=${ARCH}
+
+RUN apt-get install -y gcc
+
+WORKDIR /root/go/src/github.com/erstaples/kubernetes
+
+
+#dockerd works only when container is in "privileged" mode
+#docker run --privileged -dv $GOPATH:/root/go erstaples/localnetes:0.0.1
+CMD ["dockerd"]
